@@ -1,0 +1,184 @@
+Go only have 2 types of Data.
+1) value;
+2) pointer - address
+
+Go run like stack.
+Every function is in a frame of the memory stack.
+Every frame is isolated from others for immutability.
+
+The user of pointer is to share the data between functions.
+
+Integrity is the most important thing in programming.
+
+We can never trust the memory below the current active frame in a stack.
+
+When a function return a pointer, 
+
+Heap (whiteboard) vs Stack (Private notebook)
+
+Every go routine is running in it’s own stack.
+
+Escape analysis
+
+The only time when allocation costing performance is when there is no need of allocation.
+
+The most important thing is “this piece of code I wrote, is it fast enough while being easy to maintain”.
+
+返回指针的函数，最好在return 的时候用&的形式
+
+单独考虑这种performance没什么太大的意义，要从工程的角度出发，理解机制，然后做出合适的选择
+
+Go put 2 things on most important priority: integrity and minimize the use of resources including memory.
+
+Stack is 2k bytes, when over, Go will create another stack with 25% larger and copy the old stack to the new stack, adjust all the pointers.
+
+When there is a large amount of go routines running which means multiple stacks interact with each other, adjusting 1 stack (extend) will cost huge latency.
+
+http://agis.io/2014/03/25/contiguous-stacks-in-go.html
+
+pacing algorithm in GC
+
+gogc
+
+4MB heap with 2MB live heap, GC kicks in between 2 - 4 MB heap used.
+
+Larger heap capacity will lower the pace of triggering GC, but will greatly increase the GC’s STOP THE WORLD time.
+
+GC also is a go routine which use part of processor or the whole processor.
+
+To improve performance, the starting point is reduce the allocation which can save huge amount of time.
+
+When GC kicks in, it will stop all the other go routines on all the processors.
+
+https://tiancaiamao.gitbooks.io/go-internals/content/zh/06.2.html
+
+We must write code in predictable pattern to access memory.
+
+Hardware loves array.
+Slice in Go uses array underneath.
+
+Slice is a vector an the end of the day.
+
+Slice in Go = Vector in C
+
+每次从内存读数据会读取64b的数据,prefetcher会优化，但是我们的程序对内存的访问要可预测
+
+array的遍历就是可预测的access pattern
+
+TLB缓存
+
+https://blog.csdn.net/lcw_202/article/details/5994406
+
+分页内存管理 paging
+
+TLB cache miss的话可能需要扫描整个内存
+
+Algorithm efficiency
+How efficient you can get the data into the processor to reduce latency hurt the performance the most.
+
+单核计算机可以模拟并发，通过多个进程轮流进 core 进行运算。代价是 context switch 会花很多时间。
+
+多核计算机需要用到 scheduler 进行进程调度。
+
+EPOLL
+
+有两种工作类型，处理器的还有IO
+处理器可以一直工作，IO需要等
+如果有很多IO工作，很多线程有用
+cpu类型的任务，多线程可能不会有很大帮助，甚至反作用
+
+Pooling is critical in software programming
+
+一个task在变成wait状态之后，其他的task会被执行，当db请求返回之后，会重新变成runnable的状态，这样就有22个任务都在runnable状态
+
+每个cpu3个线程，表现最佳,太少的话，有很多idle时间，太多的话，context swtich会浪费资源
+
+我们可以通过增加处理器的方式来支持更多的线程，但是越往后，增加处理器带来的收益越小
+
+要理解同步与协调 auchronization?（竞争）
+
+data race 是如果两个线程利用内存同一个数据。一个线程在写，一个在读，所以我们应该为了避免问题负责同步。
+
+core’s global run queue & processor’s local run queue
+
+Kernel mode VS user mode
+
+context switch 在go里非常快，因为go知道每个go routine要干什么
+
+Network poller
+
+4种事件 go, gc, system call, block
+system call 现在大部分系统可以异步调
+
+Poller 负责等到一个go routine 异步任务做完之后然后把它放回global run queue
+
+go里面每个处理器会有一个线程，go的调度器在线程将变成wait状态的时候，会把该线程detach，然后创建一个新线程执行其他任务
+
+从作业系统角度来看，go的线程不进入wait 状态
+go routine的调度器使系统级别的context switch最少化
+
+一个进程就可以看成一个go routine池
+
+编程时候你要假定所有的go Routing 同时运行。
+
+这个怎么理解，任务是在线程上调度的，为什么线程会进入wait
+
+Do not think about the channel as a data structure of queue.
+Think of channel as signaling.
+
+The receiver pull the data from the sender nano seconds before, that’s a guarantee.
+
+https://stackoverflow.com/questions/39826692/what-are-golang-channels-used-for/39831976#39831976
+
+保证接收带来的副作用是信号阻塞，不确定的延迟。
+
+A channel can be in 3 states: NIL , Open , Close
+
+make channel 时不加数字就能得到一个无缓冲channel
+
+do not use buffered channel if you want send cancel signal.
+
+在web request的场景不要使用bufferred chan，不要使用fanout模式，因为可伸缩性很差。
+
+Do not write a go routine unless you write how to close gracefully.
+
+Solve the problem with one go routine first, find out how long does it take. Don’t go for multiple go routines first.
+
+atomic.AddInt32(&counter, 1) 在高并发下会出现问题，每个线程所在的CPU都会有一份 counter 变量存在 L1 cache 中，每一个发生变化的时候会把新值推送到 main memory 然后通知其他所有的进行更新，所有的同时进行的时候 latency 会疯了。
+
+解决办法是在每个 go routine 内部使用 local counter ，在进程结束的时候进行 atomic.AddInt32(&counter, lcounter)
+
+在gc的时候如果遇到新的内存申请，会先不执行malloc，先gc，gc完了再malloc
+
+hey工具可以用来产生负载
+
+为了分析推荐用ngrok
+
+GODEBUG=gctrace=1 ./project > /dev/null
+
+不用生产环境就找到 memory leak , 利用 go 的分析方式。
+如果里面关于内存的数字一直增加你软件里就存在 memory leak。 
+
+GitHub: ardanlabs/service
+
+如果服务运行在防火墙之后，可以绑定http pprof，可以随时查看服务的trace
+
+https://github.com/rakyll/hey
+
+"go tool pprof -alloc_space http://localhost:5000/debug/pprof/heap
+
+top 40 -cum 告诉你在哪儿有最多 allocation
+
+减少gc 数量影响严重。用go 分析功能不要猜猜瓶颈在哪儿，你只要看分析结果。
+
+go test -run none -bench . -benchtime 3s -benchmem -memprofile mem.out
+
+Leaf function can be inlining call.
+如果你函数里面不用别的函数 compiler 可以 inline 以避免 allocation
+
+性能提升有3种，1.）算法；2）减少allocation；3）如何高效的读取数据
+
+Name: William Kennedy (Bill) bill@ardanlabs.com
+Twitter: @goinggodotnet #golang
+Blog: https://goinggo.net
+Slack: invite.slack.golangbridge.org
