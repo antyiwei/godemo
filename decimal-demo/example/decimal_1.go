@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-
 	"math/big"
 
 	"github.com/shopspring/decimal"
