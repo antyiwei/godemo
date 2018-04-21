@@ -273,7 +273,7 @@ import (
 
 //注意字段必须是导出
 type Params struct {
-    Width, Height int
+    Width, Height int    
 }
 
 func chkError(err error) {
