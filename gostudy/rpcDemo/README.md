@@ -98,9 +98,9 @@ func main() {
 ```
 #### 输出结果：
 - 服务端：
-![avatar](./../assets/images/httpRpc-server.png)
+![avatar](./../../assets/images/httpRpc-server.png)
 - 客户端：
-![avatar](./../assets/images/httpRpc-client.png)
+![avatar](./../../assets/images/httpRpc-client.png)
 
 ### 2. 基于tcp的RPC
 服务器端：
@@ -200,9 +200,9 @@ func main() {
 ```
 #### 输出结果：
 - 服务端：
-![avatar](./../assets/images/tcpRpc-server.png)
+![avatar](./../../assets/images/tcpRpc-server.png)
 - 客户端：
-![avatar](./../assets/images/tcpRpc-client.png)
+![avatar](./../../assets/images/tcpRpc-client.png)
 
 ### 3. 基于jsonrpc的PRC
 服务器端：
@@ -304,9 +304,9 @@ func main() {
 
 #### 输出结果：
 - 服务端：
-![avatar](./../assets/images/jsonrpcRpc-server.png)
+![avatar](./../../assets/images/jsonrpcRpc-server.png)
 - 客户端：
-![avatar](./../assets/images/jsonrpcRpc-client.png)
+![avatar](./../../assets/images/jsonrpcRpc-client.png)
 
 ####  -------------------------------------------------------------------------------------------------------------------
 ####  -------------------------------------------以上来自网络整理-------------------------------------------------------
