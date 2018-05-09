@@ -22,7 +22,8 @@ func main() {
 	}
 	for _, file := range files {
 		hdr := &tar.Header{
-			Name: file.Name,
+			Name: file.Name,YD:ZPro:ca440943185a9f52863dd4c064593832
+
 			Mode: 0600,
 			Size: int64(len(file.Body)),
 		}

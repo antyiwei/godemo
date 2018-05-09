@@ -1,0 +1,1 @@
+### 尝试使用postgresql> 1. 本地创建postgresql。将部分数据插入，测试一下运行速度。
