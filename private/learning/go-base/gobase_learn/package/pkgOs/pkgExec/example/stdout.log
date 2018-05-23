@@ -1,7 +1,0 @@
-total 24
-drwxr-xr-x  6 antyiwei  staff  192  4 21 19:54 .
-drwxr-xr-x  3 antyiwei  staff   96  4 21 19:49 ..
--rw-r--r--  1 antyiwei  staff  228  4 21 19:50 exec1.go
--rw-r--r--  1 antyiwei  staff  604  4 21 19:52 exec2.go
--rw-r--r--  1 antyiwei  staff  371  4 21 19:53 exec3.go
--rw-------  1 antyiwei  staff    0  4 21 19:54 stdout.log

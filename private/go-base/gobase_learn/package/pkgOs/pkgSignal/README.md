@@ -1,0 +1,1 @@
+# Golang signal 处理### 参考资料如下- 1.[Linux Signal及Golang中的信号处理](http://colobu.com/2015/10/09/Linux-Signals/)- 2.[Golang信号处理和优雅退出守护进程](https://www.jianshu.com/p/ae72ad58ecb6)
